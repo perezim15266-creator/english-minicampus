@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-Campus: Inglés Básico</title>
+    <style>
+        :root {
+            --primary: #0A2463;
+            --secondary: #4ECDC4;
+            --accent: #FF6B6B;
+            --light: #F8F9FA;
+            --dark: #1A1A1A;
+            --success: #28A745;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .progress-container {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .progress-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .badges {
+            margin-top: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 5px;
+            text-align: center;
+            line-height: 40px;
+            font-size: 14px;
+            color: white;
+            opacity: 0.3;
+        }
+
+        .badge.unlocked {
+            background-color: var(--secondary);
+            opacity: 1;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.6s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2, h3 {
+            color: var(--primary);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .highlight {
+            background-color: rgba(78, 205, 196, 0.1);
+            padding: 10px;
+            border-left: 4px solid var(--secondary);
+            margin: 15px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #3ababa;
+            transform: translateY(-3px);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background-color: #e55a5a;
+        }
+
+        .quiz-question {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .option {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background-color: #f0f8ff;
+            border-color: var(--secondary);
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .score-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent);
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .glossary-term {
+            color: var(--secondary);
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .glossary-tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glossary-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+        }
+
+        .glossary-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .timeline {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px 0;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .timeline-item {
+            flex: 0 0 200px;
+            text-align: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .timeline-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .timeline-year {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .timeline-event {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .game-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .simulator-step {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .simulator-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .simulator-btn:hover {
+            background-color: #3ababa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .badge-icon {
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .main-content {
+                padding: 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo">📚 Mini-Campus Inglés</div>
+
+            <div class="menu-item active" data-section="modules">🏠 Módulos</div>
+            <div class="menu-item" data-section="tests">🎯 Tests</div>
+            <div class="menu-item" data-section="games">🎮 Juegos</div>
+            <div class="menu-item" data-section="progress">🏅 Progreso</div>
+            <div class="menu-item" data-section="glossary">📚 Glosario</div>
+            <div class="menu-item" data-section="timeline">⏱️ Línea de Tiempo</div>
+
+            <div class="progress-container">
+                <div class="progress-title">Progreso General</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="global-progress"></div>
+                </div>
+                <div style="text-align: center; margin-top: 10px; font-size: 14px;">0% completado</div>
+            </div>
+
+            <div class="badges">
+                <div class="badge unlocked" title="Check-In Champion"><i class="fas fa-hotel badge-icon"></i></div>
+                <div class="badge" title="Home Designer"><i class="fas fa-home badge-icon"></i></div>
+                <div class="badge" title="Comparison Master"><i class="fas fa-balance-scale badge-icon"></i></div>
+                <div class="badge" title="Rule Enforcer"><i class="fas fa-shield-alt badge-icon"></i></div>
+                <div class="badge" title="Future Planner"><i class="fas fa-calendar-alt badge-icon"></i></div>
+                <div class="badge" title="Grammar Guru"><i class="fas fa-graduation-cap badge-icon"></i></div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+
+            <!-- MODULES SECTION -->
+            <div id="modules" class="section active">
+                <h1>📘 Módulos de Aprendizaje</h1>
+                <p>Completa cada módulo para avanzar en tu camino hacia el dominio del inglés básico.</p>
+
+                <div class="card">
+                    <h2>🔹 Módulo 1: Saludos, Hotel y Rutinas Diarias</h2>
+                    <p><strong>Resumen:</strong> Aprende frases esenciales para situaciones reales: registrar una habitación, pedir servicios, describir tu rutina diaria.</p>
+                    <div class="highlight">
+                        <strong>Ejemplos prácticos:</strong><br>
+                        • "I want to check in."<br>
+                        • "Could you wake me up at 6 AM?"<br>
+                        • "I usually get up at 7:00 and have coffee."<br>
+                        • "She is watching TV right now." (Present Continuous)
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Hotel reception" style="width:100%; border-radius:8px; margin:15px 0;">
+                    <a href="#" class="btn" onclick="completeModule(1)">✅ Completar Módulo 1</a>
+                </div>
+
+                <div class="card">
+                    <h2>🔹 Módulo 2: La Casa y There Is/There Are</h2>
+                    <p><strong>Resumen:</strong> Describe tu casa, apartamento o lugar donde vives usando estructuras básicas de existencia y vocabulario de muebles y espacios.</p>
+                    <div class="highlight">
+                        <strong>Ejemplos prácticos:</strong><br>
+                        • "There are three windows in the living room."<br>
+                        • "Is there a microwave in the kitchen?"<br>
+                        • "My bedroom has a big closet and a carpet."
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1504808512518-c15652b41943?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="House interior" style="width:100%; border-radius:8px; margin:15px 0;">
+                    <a href="#" class="btn" onclick="completeModule(2)">✅ Completar Módulo 2</a>
+                </div>
+
+                <div class="card">
+                    <h2>🔹 Módulo 3: Comparativos y Superlativos</h2>
+                    <p><strong>Resumen:</strong> Compara personas, objetos y lugares usando adjetivos en forma comparativa y superlativa.</p>
+                    <div class="highlight">
+                        <strong>Ejemplos prácticos:</strong><br>
+                        • "This hotel is bigger than the one downtown."<br>
+                        • "The Pacific Ocean is deeper than the Atlantic."<br>
+                        • "She is the most talented singer I know."
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1540545591859-d3e74e853526?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Comparisons" style="width:100%; border-radius:8px; margin:15px 0;">
+                    <a href="#" class="btn" onclick="completeModule(3)">✅ Completar Módulo 3</a>
+                </div>
+
+                <div class="card">
+                    <h2>🔹 Módulo 4: Reglas, Órdenes y Obligaciones</h2>
+                    <p><strong>Resumen:</strong> Usa imperativos, modales (must, should, can) y expresiones de obligación para dar instrucciones, pedir permiso o prohibir acciones.</p>
+                    <div class="highlight">
+                        <strong>Ejemplos prácticos:</strong><br>
+                        • "You must wear a seatbelt."<br>
+                        • "Can I use your phone?"<br>
+                        • "Don’t be late for class!"<br>
+                        • "You should drink more water."
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Rules and signs" style="width:100%; border-radius:8px; margin:15px 0;">
+                    <a href="#" class="btn" onclick="completeModule(4)">✅ Completar Módulo 4</a>
+                </div>
+
+                <div class="card">
+                    <h2>🔹 Módulo 5: Planes Futuros (Going to / Will)</h2>
+                    <p><strong>Resumen:</strong> Expresa intenciones, predicciones y planes futuros con “be going to” y “will”.</p>
+                    <div class="highlight">
+                        <strong>Ejemplos prácticos:</strong><br>
+                        • "I’m going to visit my sister next weekend."<br>
+                        • "It’s going to rain tomorrow."<br>
+                        • "Will you help me with this project?"<br>
+                        • "We’ll fly to Cancun in July."
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Travel plans" style="width:100%; border-radius:8px; margin:15px 0;">
+                    <a href="#" class="btn" onclick="completeModule(5)">✅ Completar Módulo 5</a>
+                </div>
+            </div>
+
+            <!-- TESTS SECTION -->
+            <div id="tests" class="section">
+                <h1>📝 Tests y Evaluaciones</h1>
+                <p>Prueba tus conocimientos. Cada test vale 10 puntos. Tu puntaje se acumula.</p>
+                <div class="score-display" id="total-score">Puntaje Total: 0/50</div>
+
+                <div class="card">
+                    <h2>Test del Módulo 1: Saludos y Rutinas</h2>
+                    <div class="quiz-question">
+                        <p>¿Cuál es la forma correcta?</p>
+                        <div class="option" onclick="checkAnswer(this, true)">I am watching TV now.</div>
+                        <div class="option" onclick="checkAnswer(this, false)">I watch TV now.</div>
+                        <div class="option" onclick="checkAnswer(this, false)">I watched TV now.</div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <p>¿Qué significa "I want to check in"? </p>
+                        <div class="option" onclick="checkAnswer(this, true)">Deseo registrarme.</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Quiero salir del hotel.</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Necesito lavarme.</div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="submitQuiz(1)">Enviar Test 1</button>
+                </div>
+
+                <div class="card">
+                    <h2>Test del Módulo 2: La Casa</h2>
+                    <div class="quiz-question">
+                        <p>Completa: ________ a sofa in the living room?</p>
+                        <div class="option" onclick="checkAnswer(this, false)">Is there</div>
+                        <div class="option" onclick="checkAnswer(this, true)">Is there</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Are there</div>
+                    </div>
+                    <div class="quiz-question">
+                        <p>¿Cuál NO es un mueble?</p>
+                        <div class="option" onclick="checkAnswer(this, false)">Chair</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Table</div>
+                        <div class="option" onclick="checkAnswer(this, true)">Window</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitQuiz(2)">Enviar Test 2</button>
+                </div>
+
+                <div class="card">
+                    <h2>Test del Módulo 3: Comparativos</h2>
+                    <div class="quiz-question">
+                        <p>El comparativo de "tall" es:</p>
+                        <div class="option" onclick="checkAnswer(this, false)">more tall</div>
+                        <div class="option" onclick="checkAnswer(this, true)">taller</div>
+                        <div class="option" onclick="checkAnswer(this, false)">tallest</div>
+                    </div>
+                    <div class="quiz-question">
+                        <p>La forma superlativa de "good" es:</p>
+                        <div class="option" onclick="checkAnswer(this, false)">best</div>
+                        <div class="option" onclick="checkAnswer(this, true)">best</div>
+                        <div class="option" onclick="checkAnswer(this, false)">better</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitQuiz(3)">Enviar Test 3</button>
+                </div>
+
+                <div class="card">
+                    <h2>Test del Módulo 4: Reglas</h2>
+                    <div class="quiz-question">
+                        <p>Para pedir permiso formal, usa:</p>
+                        <div class="option" onclick="checkAnswer(this, false)">Can I...</div>
+                        <div class="option" onclick="checkAnswer(this, true)">May I...</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Must I...</div>
+                    </div>
+                    <div class="quiz-question">
+                        <p>“You must wear a helmet.” indica:</p>
+                        <div class="option" onclick="checkAnswer(this, false)">Recomendación</div>
+                        <div class="option" onclick="checkAnswer(this, true)">Obligación fuerte</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Posibilidad</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitQuiz(4)">Enviar Test 4</button>
+                </div>
+
+                <div class="card">
+                    <h2>Test del Módulo 5: Futuro</h2>
+                    <div class="quiz-question">
+                        <p>“I’m going to study English next year.” expresa:</p>
+                        <div class="option" onclick="checkAnswer(this, true)">Intención planeada</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Predicción sin evidencia</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Hábito habitual</div>
+                    </div>
+                    <div class="quiz-question">
+                        <p>¿Cuál es la forma correcta para una pregunta sobre el futuro?</p>
+                        <div class="option" onclick="checkAnswer(this, false)">Will you go to the party?</div>
+                        <div class="option" onclick="checkAnswer(this, true)">Will you go to the party?</div>
+                        <div class="option" onclick="checkAnswer(this, false)">Are you going to the party?</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitQuiz(5)">Enviar Test 5</button>
+                </div>
+            </div>
+
+            <!-- GAMES SECTION -->
+            <div id="games" class="section">
+                <h1>🎮 Juegos Interactivos</h1>
+                <p>Diviértete mientras aprendes. ¡Gana badges!</p>
+
+                <div class="game-container">
+                    <div class="game-card" onclick="openGame('match-it')">
+                        <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+                        <h3>Match It!</h3>
+                        <p>Empareja inglés-español</p>
+                    </div>
+                    <div class="game-card" onclick="openGame('sentence-builder')">
+                        <div class="game-icon"><i class="fas fa-sort-numeric-down"></i></div>
+                        <h3>Sentence Builder</h3>
+                        <p>Ordena palabras</p>
+                    </div>
+                    <div class="game-card" onclick="openGame('word-race')">
+                        <div class="game-icon"><i class="fas fa-clock"></i></div>
+                        <h3>Word Race</h3>
+                        <p>Traduce en 45 segundos</p>
+                    </div>
+                    <div class="game-card" onclick="openGame('superlative-showdown')">
+                        <div class="game-icon"><i class="fas fa-trophy"></i></div>
+                        <h3>Superlative Showdown</h3>
+                        <p>¡Gana contra el reloj!</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 40px;">
+                    <h2>🏨 Simulador: Hotel Check-In</h2>
+                    <p>Simula tu llegada al hotel. Haz clic en los botones para avanzar.</p>
+
+                    <div class="simulator-step" id="step1">
+                        <p>¡Llegaste al hotel! ¿Qué dices?</p>
+                        <button class="simulator-btn" onclick="nextStep(2)">I want to check in.</button>
+                    </div>
+
+                    <div class="simulator-step" id="step2" style="display:none;">
+                        <p>Recepcionista: "What's your name?"</p>
+                        <button class="simulator-btn" onclick="nextStep(3)">My name is Maria.</button>
+                    </div>
+
+                    <div class="simulator-step" id="step3" style="display:none;">
+                        <p>Recepcionista: "Do you need a wake-up call?"</p>
+                        <button class="simulator-btn" onclick="nextStep(4)">Yes, please. At 7 AM.</button>
+                    </div>
+
+                    <div class="simulator-step" id="step4" style="display:none;">
+                        <p>🎉 ¡Bien hecho! Has completado el check-in.<br>¡Has ganado 5 puntos extra!</p>
+                        <button class="btn btn-primary" onclick="addPoints(5)">+5 Puntos</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROGRESS SECTION -->
+            <div id="progress" class="section">
+                <h1>🏆 Progreso y Badges</h1>
+                <p>Este es tu mapa de logros.</p>
+
+                <div class="card">
+                    <h2>Tu Puntaje Acumulado</h2>
+                    <div class="score-display" id="user-score">0 / 50</div>
+                    <p>Avanzas al completar módulos y tests.</p>
+                </div>
+
+                <div class="card">
+                    <h2>Badges Desbloqueados</h2>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;">
+                        <div class="badge unlocked" title="Check-In Champion"><i class="fas fa-hotel"></i><br>Check-In Champ</div>
+                        <div class="badge" title="Home Designer"><i class="fas fa-home"></i><br>Home Designer</div>
+                        <div class="badge" title="Comparison Master"><i class="fas fa-balance-scale"></i><br>Comparison Master</div>
+                        <div class="badge" title="Rule Enforcer"><i class="fas fa-shield-alt"></i><br>Rule Enforcer</div>
+                        <div class="badge" title="Future Planner"><i class="fas fa-calendar-alt"></i><br>Future Planner</div>
+                        <div class="badge" title="Grammar Guru"><i class="fas fa-graduation-cap"></i><br>Grammar Guru</div>
+                    </div>
+                    <p style="margin-top: 20px; color: #666;">Desbloquea el "Grammar Guru" completando todos los módulos y obteniendo 45+ puntos.</p>
+                </div>
+            </div>
+
+            <!-- GLOSSARY SECTION -->
+            <div id="glossary" class="section">
+                <h1>📚 Glosario Dinámico</h1>
+                <p>Haz clic en cualquier palabra destacada para ver su definición.</p>
+
+                <div class="card">
+                    <p>En inglés, usamos el artículo <span class="glossary-term" data-def="Artículo definido: 'the' se usa cuando nos referimos a algo específico o conocido por ambos interlocutores. Ejemplo: 'I saw the cat.' (el gato que ya hablamos).">the</span> para cosas específicas. Por ejemplo, si dices "I visited <span class="glossary-term" data-def="Nombre propio de país compuesto: Se usa 'the' antes de países que tienen nombres compuestos por adjetivo + sustantivo, como 'the United States', 'the Dominican Republic'.">the United States</span>, estás hablando de un país específico."</p>
+
+                    <p>El verbo <span class="glossary-term" data-def="Verbo irregular: Un verbo cuya forma pasada no sigue las reglas normales. Ejemplos: go → went, eat → ate, see → saw.">go</span> tiene una forma irregular en pasado: <strong>went</strong>. No decimos 'goed'.<br><br>
+                    El <span class="glossary-term" data-def="Adverbio de frecuencia: Palabra que indica con qué frecuencia ocurre una acción. Ejemplos: always, often, never, sometimes.">adverbio de frecuencia</span> "usually" va antes del verbo principal: "I usually eat breakfast at 7."</p>
+
+                    <p>La frase <span class="glossary-term" data-def="Expresión de futuro: 'Be going to' se usa para planes intencionados o predicciones basadas en evidencia actual. Ejemplo: 'Look at those clouds! It's going to rain.'">I'm going to travel</span> indica un plan hecho antes del momento del habla.</p>
+                </div>
+            </div>
+
+            <!-- TIMELINE SECTION -->
+            <div id="timeline" class="section">
+                <h1>⏱️ Evolución Histórica del Aprendizaje del Inglés</h1>
+                <p>Explora cómo ha cambiado la enseñanza del inglés a lo largo del tiempo.</p>
+
+                <div class="timeline">
+                    <div class="timeline-item" onclick="showTimelineEvent('1970s')">
+                        <div class="timeline-year">1970s</div>
+                        <div class="timeline-event">Método Gramática-Traducción<br>(Libros pesados, memorización)</div>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineEvent('1990s')">
+                        <div class="timeline-year">1990s</div>
+                        <div class="timeline-event">CD-ROMs y programas<br>de computadora</div>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineEvent('2010s')">
+                        <div class="timeline-year">2010s</div>
+                        <div class="timeline-event">Apps móviles y aprendizaje<br>en cualquier lugar</div>
+                    </div>
+                    <div class="timeline-item" onclick="showTimelineEvent('2020s')">
+                        <div class="timeline-year">2020s</div>
+                        <div class="timeline-event">Gamificación y mini-campuses<br>como este 😊</div>
+                    </div>
+                </div>
+
+                <div id="timeline-detail" style="margin-top: 30px; padding: 20px; background-color: #f8f9ff; border-radius: 10px; display: none;">
+                    <h3 id="timeline-title">Evento seleccionado</h3>
+                    <p id="timeline-description">Haz clic en un año para ver más detalles.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL GAME -->
+    <div id="game-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Juego</h2>
+            <div id="modal-content-game">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === NAVIGATION ===
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById(item.dataset.section).classList.add('active');
+            });
+        });
+
+        // === PROGRESS BAR ===
+        let totalScore = 0;
+        let completedModules = 0;
+
+        function updateProgress() {
+            const progressFill = document.getElementById('global-progress');
+            const percentage = (completedModules / 5) * 100;
+            progressFill.style.width = percentage + '%';
+            document.querySelector('.progress-container div:last-child').textContent = `${Math.round(percentage)}% completado`;
+            document.getElementById('user-score').textContent = `Puntaje Total: ${totalScore} / 50`;
+        }
+
+        function completeModule(moduleNum) {
+            if (!document.querySelector(`.badge:nth-child(${moduleNum + 1})`).classList.contains('unlocked')) {
+                document.querySelector(`.badge:nth-child(${moduleNum + 1})`).classList.add('unlocked');
+                completedModules++;
+                updateProgress();
+                alert(`¡Módulo ${moduleNum} completado! 🎉`);
+            }
+        }
+
+        // === QUIZZES ===
+        let currentQuizAnswers = [];
+        let quizScores = [0,0,0,0,0];
+
+        function checkAnswer(option, isCorrect) {
+            if (currentQuizAnswers.length > 0 && !currentQuizAnswers[0].correct) return;
+            option.parentElement.querySelectorAll('.option').forEach(o => {
+                o.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                option.classList.add('correct');
+                currentQuizAnswers.push({ correct: true });
+            } else {
+                option.classList.add('incorrect');
+                currentQuizAnswers.push({ correct: false });
+            }
+        }
+
+        function submitQuiz(quizNumber) {
+            const score = currentQuizAnswers.filter(a => a.correct).length;
+            quizScores[quizNumber - 1] = score * 2; // 2 points per correct answer
+            totalScore += quizScores[quizNumber - 1];
+            updateProgress();
+            alert(`¡Test ${quizNumber} terminado! Puntaje: ${score}/2 (x2 = ${quizScores[quizNumber - 1]} pts)`);
+            currentQuizAnswers = [];
+        }
+
+        // === SIMULATOR ===
+        function nextStep(step) {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step${i}`).style.display = 'none';
+            }
+            document.getElementById(`step${step}`).style.display = 'block';
+        }
+
+        // === ADD POINTS ===
+        function addPoints(points) {
+            totalScore += points;
+            updateProgress();
+        }
+
+        // === GLOSSARY TOOLTIPS ===
+        document.querySelectorAll('.glossary-term').forEach(term => {
+            term.addEventListener('click', () => {
+                const definition = term.getAttribute('data-def');
+                alert(definition);
+            });
+        });
+
+        // === TIMELINE ===
+        function showTimelineEvent(year) {
+            const events = {
+                '1970s': {
+                    title: "1970s: Método Gramática-Traducción",
+                    desc: "Se enfocaba en memorizar reglas gramaticales y traducir textos literarios. Los estudiantes aprendían inglés para leer libros, no para comunicarse."
+                },
+                '1990s': {
+                    title: "1990s: CD-ROMs y Programas de Computadora",
+                    desc: "Los cursos empezaron a ser digitales. Se introdujeron audios, animaciones y ejercicios interactivos, aunque aún limitados por tecnología."
+                },
+                '2010s': {
+                    title: "2010s: Apps Móviles y Aprendizaje en Cualquier Lugar",
+                    desc: "Con smartphones y Wi-Fi, el aprendizaje se volvió personalizado, accesible y constante. Aplicaciones como Duolingo revolucionaron la educación."
+                },
+                '2020s': {
+                    title: "2020s: Gamificación y Mini-Campuses",
+                    desc: "Ahora, aprender inglés es divertido. Usamos juegos, badges, progresos visuales y simuladores reales. ¡Tú estás aquí, en el futuro!"
+                }
+            };
+            document.getElementById('timeline-title').textContent = events[year].title;
+            document.getElementById('timeline-description').textContent = events[year].desc;
+            document.getElementById('timeline-detail').style.display = 'block';
+        }
+
+        // === GAMES ===
+        function openGame(gameName) {
+            const modal = document.getElementById('game-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content-game');
+
+            modalTitle.textContent = gameName === 'match-it' ? 'Match It!' :
+                                   gameName === 'sentence-builder' ? 'Sentence Builder' :
+                                   gameName === 'word-race' ? 'Word Race' : 'Superlative Showdown';
+
+            modalContent.innerHTML = `
+                <p>¡Este juego está en desarrollo! En una versión real, sería interactivo.</p>
+                <p>Estás jugando: <strong>${gameName.replace('-', ' ')}</strong></p>
+                <p>¡Felicidades! Has desbloqueado este juego. 🎮</p>
+                <button class="btn btn-primary" onclick="alert('¡Premio: +10 puntos!'); addPoints(10); closeModal();">Aceptar y Ganar 10 Puntos</button>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('game-modal').style.display = 'none';
+        }
+
+        // INITIALIZE
+        updateProgress();
+    </script>
+
+</body>
+</html>
